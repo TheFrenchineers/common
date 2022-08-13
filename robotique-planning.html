@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .grid{
+            display: grid;
+            grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto auto;
+            justify-items: center;
+            align-items: center;
+            font-family: consolas;
+        }
+        div.grid>div{
+            display: inline-grid;
+            align-items: center;
+            width: calc(100% - 2px);
+            height: calc(100% - 2px);
+            border-radius: 10px;
+        }
+        div.grid>div[r="1"],div.grid>*[c="1"] {
+            text-align: center;
+            min-width: max-content;
+        }
+        div.grid>div:not([r="1"],[c="1"]) {
+            font-size: 70%;
+        }
+        div.grid>div>div{
+            margin: 20px;
+        }
+
+        div.grid>div[r="1"]{ grid-row: 1; background-color: #aaa; color: #fff; text-decoration: underline; }
+        div.grid>div[r="2"]{ grid-row: 2; background-color: #f00;}
+        div.grid>div[r="3"]{ grid-row: 3; background-color: #ff0;}
+        div.grid>div[r="4"]{ grid-row: 4; background-color: #0f0;}
+        div.grid>div[r="5"]{ grid-row: 5; background-color: #00f;}
+        div.grid>div[c="1"]{ grid-column: 1; grid-column-end: 3; }
+        div.grid>div[c="2"]{ grid-column: 2; grid-column-end: 4; }
+        div.grid>div[c="3"]{ grid-column: 3; grid-column-end: 6; }
+        /* div.grid>div[c="4"]{ grid-column: 4; grid-column-end: ; } */
+        div.grid>div[c="5"]{ grid-column: 5; grid-column-end: 7; }
+        div.grid>div[c="6"]{ grid-column: 6; grid-column-end: 9; }
+        /* div.grid>div[c="7"]{ grid-column: 7; grid-column-end: ; } */
+        div.grid>div[c="8"]{ grid-column: 8; grid-column-end: 10; }
+        div.grid>div[c="9"]{ grid-column: 9; grid-column-end: 12; }
+        /* div.grid>div[c="10"]{ grid-column: 10; grid-column-end: ; } */
+        div.grid>div[c="11"]{ grid-column: 11; grid-column-end: 13; }
+        div.grid>div[c="12"]{ grid-column: 12; grid-column-end: 14; }
+        div.grid>div[d="2"]{ grid-column-end: 2; }
+        div.grid>div[d="5"]{ grid-column-end: 5; }
+        div.grid>div[d="8"]{ grid-column-end: 8; }
+        div.grid>div[d="11"]{ grid-column-end: 11; }
+        div.grid>div[d]{ background: none; }
+
+        div.grid>div[r="2"][c="6"], div.grid>div[r="2"][c="9"]{ grid-row-end: 4; background-color: #f70; }
+        div.grid>div[r="5"][c="6"]{ grid-column-end: 12; }
+
+        script{
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid">
+        <div r="1" c="2">A</div>         <div r="1" c="5">B</div>         <div r="1" c="8">C</div>         <div r="1" c="11">D</div>         <div r="1" c="13">E</div>
+        <div r="2" c="1">F</div>         <div r="2" c="3">G</div>         <div r="2" c="6">H</div>         <div r="2" c="9">I</div>          <div r="2" c="12">J</div>
+        <div r="3" c="1">K</div>         <div r="3" c="3">L</div>                                                                            <div r="3" c="12">O</div>
+        <div r="4" c="1">P</div>         <div r="4" c="3">Q</div>         <div r="4" c="6">R</div>         <div r="4" c="9">S</div>          <div r="4" c="12">T</div>
+        <div r="5" c="1">U</div>         <div r="5" c="3">V</div>         <div r="5" c="6">W</div>                                           <div r="5" c="12">X</div>
+        <div r="1" c="1" d="2"></div><div r="1" c="4" d="5"></div><div r="1" c="7" d="8"></div><div r="1" c="10" d="11"></div>   
+        <script>
+            const txt = [
+            "rentrée","kick-off","mi-temps","compétition","jour J",
+            "Conception",
+                "Montrer les concepts de l’année dernière comme la pince, les grosses roues avec les anneaux, etc. Réfléchir potentiellement à un châssis adapté au mieux au terrain que l’on pourra réadapter en fonction de l’objectif de l’année.",
+                "Prévoir une stratégie en fonction des points et développer le robot suivant cette stratégie pour avoir un robot qui marche dès la moitié de l'année en prenant les conseils/demandes des programmeurs.",
+                "On doit avoir un robot qui marche et qui répond à la stratégie finale (car elle peut varier au cours du temps). Il faut néanmoins essayer de revoir chaque partie du robot afin de trouver une solution optimale ou simplement qui soit plus performante.",
+                "Ne rien changer sur le robot mais vérifier qu'il est intact.",
+            "Construction",
+                "Pareil que la conception, mais on pourrait peut-être commencer à monter le châssis si on est tous d’accord de vouloir et déconstruire le robot (ça dépend de si on veut garder le même type de robot et peut-être qu'il faut attendre le kick-off pour faire ça).",
+                "Bien tout resserrer. (Ne pas oublier de bien attacher la batterie)",
+            "Programmation",
+                "Montrer le code de l'année dernère, si on y arrive, on peut aussi programmer les mouvements du robots avec une gamepad.",
+                "Intégrer les parties ajoutées dans le programme principal du robot au fur et a mesure de la construction. Travailler en grande partie sur le mode manuel qui permet à la fois au(x) driver(s) de de s'entraîner et de détecter les ptentiels bugs, mais réfléchir au fonctionnement du mode autonome.",
+                "Travailler sur le mode autonome, on s'attend à ce que toutes les parties du robot prévues lors de la conception soient construites et intégrées au programme. Finir le mode manuel en cas de besoin / résoudre les tweaks et s'adapter au(x) driver(s).",
+                "Ne rien changer au code à moins d'être sûr qu'on ne le regrettera pas ou que le robot est endommagé.",
+            "Communication",
+                "Donner accès à tous ceux qui veulent au github et aux réseaux sociaux (instagram et discord).",
+                "Prendre des photos/films, compléter le notebook à chaque séance et poster des vidéos et des photos sur les réseaux sociaux au fur de la construction du robot. (Prévoir la présentation au jury).",
+                "Prendre des photos de la compétition pour les années à venir. Montrer aux juges comme on est fort :)"
+            ]
+            const children = document.getElementsByClassName('grid')[0].children;
+            for (let i = 0; i < 22; i++){
+                children[i].innerHTML = `<div>${txt[i]}</div>`;
+            }
+        </script>
+    </div>
+</body>
+
+</html>
