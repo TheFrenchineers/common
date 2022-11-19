@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="icon" size="192x192" href="centered%20logo.svg">
+    <link rel="apple-touch-icon" href="centered%20logo.svg">
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            height: 100vh;
+            width: 100vh;
+            transform: matrix(1, 0, 0, -1, 0, 0)
+        }
+
+        div {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas></canvas>
+    <div>
+        <input type="checkbox" checked />
+        <input type="checkbox" />
+        <input type="checkbox" />
+    </div>
+    <script>
+        const canvas = document.querySelector('canvas');
+        canvas.width = 1000;
+        canvas.height = 1000;
+        const ctx = canvas.getContext('2d');
+        const [check1, check2, check3] = document.querySelectorAll('input');
+        class Vector {
+            constructor(...values) {
+                for (let i in values) this[i] = values[i];
+                this.length = values.length;
+            }
+            add(...v) { for (let i = 0; i < this.length; i++) this[i] += v.map(e => e[i]).reduce((s, p) => s + p); return this; }
+            subtract(...v) { for (let i = 0; i < this.length; i++) this[i] -= v.map(e => e[i]).reduce((s, p) => s + p); return this; }
+            multiply(n) { for (let i = 0; i < this.length; i++) this[i] *= n; return this; }
+            scalar(v) { return this.array.map((e, i) => e * v[i]).reduce((s, p) => s + p); }
+            map(callback) { for (let i = 0; i < this.length; i++) this[i] = callback(this[i], i); return this; }
+            setValue(v) { return this.map((e, i) => v[i]); };
+            rotate(v) { const [a, b] = typeof v === "number" ? [Math.cos(v), Math.sin(v)] : v; return this.setValue([this[0] * a - this[1] * b, this[0] * b + this[1] * a]); }
+            isOpposite(v) { return this[0] ** 2 + this[1] ** 2 + v[0] ** 2 + v[1] ** 2 > (this[0] + v[0]) ** 2 + (this[1] + v[1]) ** 2; }
+            get norm() { return Math.hypot(...this.array); }
+            set norm(n) { const N = this.norm; if (N === 0) return this; return this.multiply(n / N); }
+            get array() { return [...this]; }
+            get clone() { return new Vector(...this); }
+            get orthogonal() { return new Vector(-this[1], this[0]); }
+            get opposite() { return new Vector(-this[0], -this[1]); }
+            [Symbol.iterator]() { var index = 0; const data = this; return { next: () => ({ value: data[index++], done: index - 1 === data.length }) }; }
+            valueOf() { return this.array.join(','); }
+            static get mul() { return new Vector(Math.cos, Math.sin) };
+        }
+        const mid = new Vector(500, 500);
+        asize = 200;
+        bsize = 200;
+        msize = 40;
+        psize = 10;
+        point0 = new Vector(0, 0);
+        rot0 = Math.PI / 4 * 3;
+        rot1 = 0;
+        var point2, point3, point4, point5, point6, point7;
+        function getPoints() {
+            c0 = Vector.mul.map(e => e(rot0));
+            c1 = Vector.mul.map(e => e(rot1));
+            point1 = c1.clone.multiply(msize);
+            point2 = c0.clone.multiply(asize);
+            // point3 = c1.clone.multiply(psize).add(point1);
+            point4 = point2.clone.add(point1);
+            point5 = point2.clone.add(point1.orthogonal);
+            point6 = c1.opposite.multiply(bsize).add(point2);
+            point7 = new Vector(0, msize);
+            point8 = point2.clone.add(point7.orthogonal.opposite);
+            point9 = point2.clone.add(point7);
+            pointA = point6.clone.add(point7);
+        }
+        function draw() {
+            ctx.clearRect(0, 0, 1000, 1000)
+            getPoints();
+            if (check3.checked) {
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(...point7.clone.add(mid));
+                ctx.lineTo(...point8.clone.add(mid));
+                ctx.lineTo(...point9.clone.add(mid));
+                ctx.lineTo(...pointA.clone.add(mid));
+                ctx.lineTo(...point6.clone.add(mid));
+                ctx.moveTo(...point8.clone.add(mid));
+                ctx.lineTo(...point2.clone.add(mid));
+                ctx.lineTo(...point9.clone.add(mid));
+                ctx.stroke();
+            }
+            if (check2.checked) {
+                ctx.strokeStyle = "#f00";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(...point0.clone.add(mid));
+                ctx.lineTo(...point1.clone.add(mid));
+                ctx.lineTo(...point4.clone.add(mid));
+                ctx.lineTo(...point5.clone.add(mid));
+                ctx.lineTo(...point6.clone.add(mid));
+                ctx.lineTo(...point2.clone.add(mid));
+                ctx.moveTo(...point4.clone.add(mid));
+                ctx.lineTo(...point2.clone.add(mid));
+                ctx.lineTo(...point5.clone.add(mid));
+                ctx.stroke();
+            }
+            if (check1.checked) {
+                ctx.strokeStyle = "#0f0";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(...point0.clone.add(mid));
+                ctx.lineTo(...point2.clone.add(mid));
+                ctx.stroke();
+            }
+        }
+        onkeydown = ({ key }) => {
+            switch (key) {
+                case "ArrowRight":
+                    rot0 -= .02;
+                    break;
+                case "ArrowLeft":
+                    rot0 += .02;
+                    break;
+                case "ArrowUp":
+                    rot1 += .03;
+                    break;
+                case "ArrowDown":
+                    rot1 -= .03;
+                    break
+            }
+            draw();
+        }
+        [check1,check2,check3].forEach(e=>e.onchange=draw)
+        draw();
+    </script>
+</body>
+
+</html>
