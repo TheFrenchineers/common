@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style></style>
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+        <!-- <g id="pinceL">
+            <path />
+            <circle />
+        </g>
+        <g id="pinceR">
+            <path />
+            <circle />
+        </g> -->
+        <path />
+    </svg>
+    <script>
+        const $ = (s, p = document) => p.querySelector(s);
+        const svg = $('svg');
+        const path = $('path', svg);
+        // const svg = document.body.children[0];
+        // const [pinceL, pinceR] = ['#pinceL', '#pinceR'].map(e => $(e, svg));
+        // const [p1L, c1L] = pinceL.children;
+        // const [p1R, c1R] = pinceR.children; 
+
+        // const data = [10,0,10,10,15];
+        // const l = [30,15,15];
+
+        // function update() {
+        //     // Pince Gauche
+
+
+        // }
+        const otherfunctions = [
+            x => (b = (x / Math.PI * teeth_N) % 1, (b < .5 ? b * 4 - 1 : 3 - b * 4) * teeth_S),
+            x => (b = (x / Math.PI / 2 * teeth_N) % 1 * 7, (b < 1 ? 1 - (b - 1) ** 2 : b < 3 ? 1 : b < 4 ? 1 - (b - 3) ** 2 : -Math.sqrt(1.5 ** 2 - (b - 5.5) ** 2) * .2) * teeth_S)
+        ];
+        var teeth_N = 120//15;
+        var teeth_S = .5//5;
+        var precision = 240//1000;
+        var func = x => Math.max(Math.cos(x * teeth_N), 0) * teeth_S;
+        var r = 19.5//40;
+        var run = () => {
+            svg.setAttribute('viewBox', `${-r - teeth_S} ${-r - teeth_S} ${(r + teeth_S) * 2} ${(r + teeth_S) * 2}`)
+            var str = '';
+            for (let d = 0; d < precision; d++) {
+                const i = d * Math.PI * 2 / precision;
+                const j = func(i) + r;
+                str += (i ? ' L ' : 'M ') + Math.cos(i) * j + ',' + Math.sin(i) * j;
+            }
+            path.setAttribute('d', str + ' z');
+        }
+        String.prototype.splice = function (index, rem, str) {
+            return this.slice(0, index) + str + this.slice(index + Math.abs(rem));
+        };
+        function numbertoSTL(n) {
+            if (n === 0) return '0.00000E+000';
+            const s = Math.sign(n);
+            const k = Math.floor(Math.log10(Math.abs(n)));
+            n *= 10 ** -k;
+            n = (Math.round(n * 1e5) * 1e-5).toString()
+            if (n.length === (s === -1 ? 2 : 1)) n += '.00000';
+            else for (let i = n.length; i < (s === -1 ? 8 : 7); i++) n += '0';
+            var k_txt = Math.abs(k).toString();
+            while (k_txt.length < 3) k_txt = '0' + k_txt;
+            if (k >= 3) console.log(n)
+            return `${n.slice(0, (s === -1 ? 8 : 7))}E${k < 0 ? '-' : '+'}${k_txt}`
+        }
+        const vertexText = point => `            vertex ${point.map(numbertoSTL).join(' ')}`;
+        const vertexText_xxx = point => `            vertex ${point.join(' ')}`;
+        function get_points(txtH) {
+            // const index = Math.PI / 250;
+            const points = [];
+            for (let de = 0; de < precision; de++) {
+                const i = de * Math.PI * 2 / precision;
+                const j = func(i) + r;
+                const x = Math.cos(i) * j, y = Math.sin(i) * j;
+                const txtX = numbertoSTL(x), txtY = numbertoSTL(y)
+                points[de] = [x, y, `            vertex ${txtX} ${txtY}`];
+            }
+            console.log(points)
+            return points
+        }
+        const txt0 = numbertoSTL(0);
+        const txtm = numbertoSTL(-1);
+        const txt1 = numbertoSTL(1);
+        function toSTL() {
+            const height = Number(prompt("prism height", 10)) || 10;
+            var str = `solid gear\n`//T${teeth_N}S${teeth_S}H${height}\n`
+            const t = "    ";
+            // const addFacetUp_txt = t + 'facet normal '
+            const txtH = numbertoSTL(height);
+            const middlePointUp = vertexText_xxx([txt0, txt0, txtH]);
+            const middlePointDown = vertexText_xxx([txt0, txt0, txt0]);
+            const points = get_points(txtH);
+            for (let i = 0; i < precision; i++) {
+                const p = points[i];
+                const q = points[(i + 1) % precision];
+                // bottom
+                str += `    facet normal ${txt0} ${txt0} ${txtm}\n        outer loop\n${middlePointDown}\n${p[2]} ${txt0}\n${q[2]} ${txt0}\n        endloop\n    endfacet\n`
+                // top
+                str += `    facet normal ${txt0} ${txt0} ${txt1}\n        outer loop\n${middlePointUp}\n${p[2]} ${txtH}\n${q[2]} ${txtH}\n        endloop\n    endfacet\n`
+                // side
+                const normal = [...[q[1] - p[1], p[0] - q[0]].map(numbertoSTL), txt0].join(' ');
+                str += `    facet normal ${normal}\n        outer loop\n${p[2]} ${txt0}\n${p[2]} ${txtH}\n${q[2]} ${txtH}\n        endloop\n    endfacet\n`
+                str += `    facet normal ${normal}\n        outer loop\n${q[2]} ${txtH}\n${q[2]} ${txt0}\n${p[2]} ${txt0}\n        endloop\n    endfacet\n`
+            }
+            return str + `endsolid gear`
+        }
+        onkeydown = (e) => {
+            const { key, ctrlKey, shiftKey } = e;
+            if (ctrlKey) {
+                if (key.toLowerCase() === 's') {
+                    e.preventDefault()
+                    const a = document.createElement('a');
+                    if (shiftKey) {
+                        a.href = 'data:image/svg+xml;utf-8,' + encodeURIComponent(toSTL());
+                        a.download = `gear_T${teeth_N}S${teeth_S}.stl`;
+                    } else {
+                        a.href = 'data:text/stl;utf-8,' + encodeURIComponent(svg.outerHTML);
+                        a.download = `gear_T${teeth_N}S${teeth_S}.svg`;
+                    }
+                    a.click();
+                }
+                console.log(key)
+                if (key === 'e') {
+                    e.preventDefault()
+                    teeth_N = Number(prompt('teeth_N', teeth_N) || teeth_N)
+                    teeth_S = Number(prompt('teeth_S', teeth_S) || teeth_S)
+                    r = Number(prompt('r', r) || r)
+                    s = Number(prompt("scale", 0.26458333) || 1)
+                    r /= s;
+                    teeth_S /= s;
+                    func = eval(prompt('func', func.toString()) || func)
+                    precision = Number(prompt('precision', precision) || precision)
+                    run()
+                }
+            }
+        }
+        run()
+    </script>
+</body>
+
+</html>
