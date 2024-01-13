@@ -19,7 +19,6 @@
         #input {
             box-shadow: 1px 0px 5px;
             height: 100%;
-            width: min-content;
             overflow-y: scroll;
         }
 
@@ -54,20 +53,20 @@
         <div id="input">
             <div id="content">
                 <h3>2D View</h3>
-                Number of teeth: <input id="teethN" value="15" placeholder="int"><br><br>
-                Teeth size: <input id="teethS" value="3.5" placeholder="float"><br><br>
-                Gear radius: <input id="radius" value="18" placeholder="float"><br><br>
-                Function: <input id="fn" value="default_fn" placeholder="f = x :float => () -> float"
-                    title="default/trianle/square/cos"><br><br>
-                Precision: <input id="precision" value="1000" placeholder="int"><br><br>
+                Number of teeth: <br><input id="teethN" value="15" placeholder="int"><br><br>
+                Teeth size: <br><input id="teethS" value="3.5" placeholder="float"><br><br>
+                Gear radius: <br><input id="radius" value="18" placeholder="float"><br><br>
+                Function: <br><input id="fn" value="default_fn" placeholder="f = x :float => () -> float"
+                    title="default/trianle/square/ramp/cos"><br><br>
+                Precision: <br><input id="precision" value="1000" placeholder="int"><br><br>
                 <button title="save SVG"
                     onclick="const a = document.createElement('a');a.href = 'data:text/stl;utf-8,' + encodeURIComponent(svg.outerHTML);a.download = `gear_T${teeth_N}S${teeth_S}.svg`;a.click();">save
                     2D graphic</button>
                 <hr>
                 <h3>3D View</h3>
-                Height: <input id="height" value="10" placeholder="float"><br><br>
-                Angle: <input id="angle" value="0" placeholder="float"><br><br>
-                Height Precision: <input id="hprecision" value="1" placeholder="int"><br><br>
+                Height: <br><input id="height" value="10" placeholder="float"><br><br>
+                Angle: <br><input id="angle" value="0" placeholder="float"><br><br>
+                Height Precision: <br><input id="hprecision" value="1" placeholder="int"><br><br>
                 <button title="save STL"
                     onclick="const a = document.createElement('a');a.href = 'data:image/stl;utf-8,' + encodeURIComponent(toSTL());a.download = `gear_T${teeth_N}S${teeth_S}.stl`;a.click();">save
                     3D shape</button>
@@ -95,7 +94,8 @@
         const default_fn = x => (b = (x / Math.PI / 2 * teeth_N) % 1 * 7, (b < 1 ? 1 - (b - 1) ** 2 : b < 3 ? 1 : b < 4 ? 1 - (b - 3) ** 2 : -Math.sqrt(1.5 ** 2 - (b - 5.5) ** 2) * .2) * teeth_S);
         const triangle_fn = x => (b = (x / Math.PI / 2 * teeth_N) % 1, (b < .5 ? b * 4 - 1 : 3 - b * 4) * teeth_S);
         const cos_fn = x => Math.cos(x * teeth_N) * teeth_S;
-        const square_fn = x => (b = (x / Math.PI * teeth_N / 2) % 1, (b < .5 ? 1 : -1) * teeth_S);
+        const square_fn = x => (b = (x / Math.PI / 2 * teeth_N) % 1, (b < .5 ? 1 : -1) * teeth_S);
+        const ramp_fn = x => ((x / Math.PI / 2 * teeth_N) % 1 * 2 - 1) * teeth_S;
         var teeth_N = 15;
         var teeth_S = 3.5;
         var precision = 1000;
@@ -222,9 +222,9 @@
         const inp_a = $('#angle');
         const inp_hp = $('#hprecision');
         inp_tN.onchange = function () { console.log(Number(inp_tN.value)); if (!isNaN(Number(inp_tN.value))) { teeth_N = Number(inp_tN.value); run(); show_fn(); } }
-        inp_tS.onchange = function () { if (!isNaN(Number(inp_tS.value))) { teeth_S = Number(inp_tN.value); run(); } }
-        inp_rad.onchange = function () { if (!isNaN(Number(inp_rad.value))) { r = Number(inp_tN.value); run(); } }
-        inp_f.onkeydown = function ({ key }) { if (key === "Enter") { func = eval(inp_f.value); run(); show_fn(); } }
+        inp_tS.onchange = function () { if (!isNaN(Number(inp_tS.value))) { teeth_S = Number(inp_tS.value); run(); } }
+        inp_rad.onchange = function () { if (!isNaN(Number(inp_rad.value))) { r = Number(inp_rad.value); run(); } }
+        inp_f.onchange = function () { func = eval(inp_f.value); run(); show_fn(); }
         inp_p.onchange = function () { if (!isNaN(Number(inp_rad.value))) { precision = Number(inp_p.value); run(); show_fn(); } }
     </script>
 </body>
