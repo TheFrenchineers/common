@@ -93,7 +93,7 @@
         const svgf = $('#svg_fn');
         const pathf = $('path', svgf);
         const default_fn = x => (b = (x / Math.PI / 2 * teeth_N) % 1 * 7, (b < 1 ? 1 - (b - 1) ** 2 : b < 3 ? 1 : b < 4 ? 1 - (b - 3) ** 2 : -Math.sqrt(1.5 ** 2 - (b - 5.5) ** 2) * .2) * teeth_S);
-        const triangle_fn = x => (b = (x / Math.PI * teeth_N) % 1, (b < .5 ? b * 4 - 1 : 3 - b * 4) * teeth_S);
+        const triangle_fn = x => (b = (x / Math.PI / 2 * teeth_N) % 1, (b < .5 ? b * 4 - 1 : 3 - b * 4) * teeth_S);
         const cos_fn = x => Math.cos(x * teeth_N) * teeth_S;
         const square_fn = x => (b = (x / Math.PI * teeth_N / 2) % 1, (b < .5 ? 1 : -1) * teeth_S);
         var teeth_N = 15;
